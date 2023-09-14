@@ -15,11 +15,11 @@ const CartDropdown = () =>{
 
         <div className="cart-dropdown-container">
         <div className="cart-items">
-        {cartitems.map(item => {
+        {cartitems.length ? cartitems.map(item => {
             return (
                <CartItems  key={item.id} item ={item}/>
             )
-        })}
+        }) : <span>Your cart is empty</span>}
         </div>
         <Button onClick={handleClick}>Go To Checkout</Button>
         </div>
