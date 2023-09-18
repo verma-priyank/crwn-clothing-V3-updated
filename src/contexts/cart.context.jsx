@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useReducer, useState } from "react";
 
 const addCartItems =(productToAdd , cartitems) =>{
     
@@ -38,33 +38,68 @@ export const CartContext = createContext({
   clearItemFromCart : () => {} ,
   cartTotal : 0
 })
+const USER_ACTION_TYPE = {
+  SET_CART_ITEM : "SET_CART_ITEM"
+}
 
 export const CartProvider =({children}) =>{
   const [isCartOpen , setIscartOpen] = useState(false)
-  const [cartitems , setCartItems] = useState([])
-  const [cartCount , setCartCount] = useState(0)
-  const [cartTotal , setCartTotal] = useState(0)
+  // const [cartitems , setCartItems] = useState([])
+  // const [cartCount , setCartCount] = useState(0)
+  // const [cartTotal , setCartTotal] = useState(0)
 
-  useEffect(() =>{
-  const cartTotal = cartitems.reduce((acc , item) => acc + item.quantity , 0)
-  setCartCount(cartTotal)
+  const INITIAL_STATE ={
+    cartitems : [],
+    cartCount : 0 ,
+    cartTotal : 0 ,
+  }
 
-  } ,[cartitems])
+  const cartReducer =(state , action) => {
+    const {type , payload} = action ;
+    switch(type) {
+      case USER_ACTION_TYPE.SET_CART_ITEM :
+        return {
+          ...state,
+          ...payload
+        }
+        default :
+        return alert("Unauthorised Error")
+    }
+
+  }
+  const [ {cartCount , cartTotal , cartitems} , dispatch] = useReducer(cartReducer , INITIAL_STATE)
+  const updatedCartItems =(newcartItems) =>{
+    const newcartTotal = newcartItems.reduce((acc , item) => acc + item.quantity , 0)
+
+    const newtotalPrice = newcartItems.reduce((acc , item) => acc + (item.quantity * item.price) ,0)
+    dispatch({type : USER_ACTION_TYPE.SET_CART_ITEM , payload : {cartitems : newcartItems , cartTotal : newtotalPrice , cartCount : newcartTotal} } )
+
+  }
+
+
+  // useEffect(() =>{
+  // const cartTotal = cartitems.reduce((acc , item) => acc + item.quantity , 0)
+  // setCartCount(cartTotal)
+
+  // } ,[cartitems])
   
-  useEffect(()=>{
-    const totalPrice = cartitems.reduce((acc , item) => acc + (item.quantity * item.price) ,0)
-    setCartTotal(totalPrice)
-  } ,[cartitems])
+  // useEffect(()=>{
+  //   const totalPrice = cartitems.reduce((acc , item) => acc + (item.quantity * item.price) ,0)
+  //   setCartTotal(totalPrice)
+  // } ,[cartitems])
 
 const addItemsToCart =(productToAdd) =>{
-   return setCartItems(addCartItems(productToAdd , cartitems))
+   const newcartItems = addCartItems(productToAdd , cartitems)
+   updatedCartItems(newcartItems)
 }
 
 const removeItemFromCart =(productToRemove) =>{
-    return setCartItems(removeCartItem(productToRemove , cartitems))
+  const newcartItems = removeCartItem(productToRemove , cartitems)
+  updatedCartItems(newcartItems)
 }
 const clearItemFromCart =(productToClear) => {
-   return setCartItems(clearCartItem(productToClear , cartitems))
+  const newcartItems =clearCartItem(productToClear , cartitems)
+  updatedCartItems(newcartItems)
 }
 
    const value = {isCartOpen , setIscartOpen , cartitems , addItemsToCart , cartCount , removeItemFromCart ,clearItemFromCart , cartTotal}
