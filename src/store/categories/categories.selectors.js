@@ -1,7 +1,7 @@
 import { createSelector } from "reselect";
 
 const selectcategoryReducer = (state) =>{
-    console.log("reselect2")
+    
     return state.categories
 }
 
@@ -14,7 +14,7 @@ export const selectCategories = createSelector(
 export const categoriesSelector = createSelector(
     [selectCategories] ,
     (categories) => {
-        console.log("reselect3")
+        
         return categories.reduce((acc , category) => {
         
         const {title , items} = category ;
